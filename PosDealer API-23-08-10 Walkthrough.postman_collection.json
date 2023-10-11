@@ -1,0 +1,811 @@
+{
+	"info": {
+		"_postman_id": "1aad402f-401c-4c4e-94b0-6669fbf53e2d",
+		"name": "2 PosDealer API-23-08-10 Walkthrough",
+		"description": "# Overview\n\n> Please note that the PosDealer API is currently in **preview** and may not be fully stable yet. Our team is working hard on finalizing the last bits of this API. \n  \n\nThis collection provides PosDealers with sample requests demonstrating how to manage PosOperators, their outlets and even perform product rollouts.  \nYou may start using the PosDealer API by retrieving a list with all your PosOperators' relevant data for further actions. You can further invite new PosOperators, and create and manage outlets for them. Then you can check available permissions and use Rollout plans accordingly to transfer entitlements and produce subscriptions for your customers. Finally, you can use the template endpoint to create Middleware configurations.\n\nAll operations that the PosDealer API offers are also available in the fiskaltrust.Portal, if you prefer to use a graphical user interface over this API.\n\n# API design principles\n\nThe PosDealer API was designed in a RESTful and follows those design principles. The API accepts and returns JSON data and uses standard HTTP status codes for responses.\n\n## Authentication\n\nThe PosDealer API can only be used with the access data of a PosDealer.  \nThese credentials can be found on the fiskaltrust.Portal ([AT]() / [DE]() / [FR]() / [IT]()) in the `API Access` section of your account profile.  \nYou will need both `AccountId` and `AccessToken` to use this API.  \nThese values can be obtained from the fiskaltrust.Portal only; access data will not be sent via, e.g., E-Mail by fiskaltrust.  \nPlease note that you can change the `AccessToken` of your account (Company / Overview / `Reset` ), e.g., if your credentials got leaked. The `AccountId` is unchangeable.  \nIf you face authorization problems, check your account's assigned roles in fiskaltrust.Portal (`Company` / `Overview`) and ensure you have the appropriate permissions to access the account of your PosOperator.\n\n## Versioning\n\nThis API uses semantic versioning, meaning only major version changes contain breaking changes. Non-breaking changes (like returning additional data without changing the original model) will not increase the major version.\n\n- The latest version is used if no version is specified (like in the samples in this collection).\n- Users can specify versions by explicitly stating it in the URL once more versions are released.\n    \n\n# Quickstart\n\n- Open the fiskaltrust.Portal and go to `Company` / `Overview`.\n- Scroll in the AccountProfile for the `API Access` section.\n- You will find an `AccountId` and an `AccessToken`. You will need both values for authorization with the fiskaltrust PosDealer API.\n- Switch to Postman\n- Select the `Workspace` with the fiskaltrust PosDealer API Postman collection.\n- Tick the burger menu and select `Edit`.\n- Switch to the tab `Variables`.\n- Enter your access data as `Current Values` at `PosDealer_AccountID` and at `PosDealer_AccessToken`.\n- `Save` your values\n- Do not change the entry at `base_url`. The fiskaltrust PosDealer API is not country-specific.\n- Select `Invite and manage PosOperators` and `List connected PosOperators`.\n- With `Send` your first request of the fiskaltrust PosDealer API Postman collection is done and the response shows all PosOperators, that are connected with your account.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14296361",
+		"_collection_link": "https://martian-desert-834527.postman.co/workspace/area-for-trainings~6a78f737-640d-473c-a4d3-45aa26518ee8/collection/14296361-1aad402f-401c-4c4e-94b0-6669fbf53e2d?action=share&source=collection_link&creator=14296361"
+	},
+	"item": [
+		{
+			"name": "Invite and manage PosOperators",
+			"item": [
+				{
+					"name": "List connected PosOperators (USE)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accountId",
+								"value": "{{posdealer_account_id}}",
+								"description": "The account ID of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							},
+							{
+								"key": "accessToken",
+								"value": "{{posdealer_access_token}}",
+								"description": "The account access token of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/posoperators",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"posoperators"
+							]
+						},
+						"description": "This request lists the PosOperators (i.e. the merchants) that are connected to the PosDealer specified by the `accountId` header.\n\nPlease note that only active connections (i.e. connection that the PosOperator has accepted) are returned in this version of the API."
+					},
+					"response": []
+				},
+				{
+					"name": "Invite a new PosOperator",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accountId",
+								"value": "{{posdealer_account_id}}",
+								"description": "The account ID of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							},
+							{
+								"key": "accessToken",
+								"value": "{{posdealer_access_token}}",
+								"description": "The account access token of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"company\": {\r\n    \"name\": \"The name of the company\",\r\n    \"email\": \"E-Mail address of the primary account\",\r\n    \"addressLine1\": \"Address Line 1\",\r\n    \"addressLine2\": \"Address Line 2\",\r\n    \"postalCode\": \"Postal code, e.g. 5020\",\r\n    \"city\": \"City, e.g. Salzburg\",\r\n    \"country\": \"2-digit ISO code of the country, e.g. AT\",\r\n    \"website\": \"Website (optional)\",\r\n    \"phoneNumber\": \"Phone number of the company (optional)\",\r\n    \"identifiers\": {\r\n      \"vatId\": \"VAT number, e.g. AT123456789\",\r\n      \"taxId\": \"Local tax ID, depending on the country\",\r\n      \"fibuNr\": \"Local FIBU number (Austria only)\",\r\n      \"gln\": \"GLN number\",\r\n      \"siren\": \"Local SIREN number (France only)\"\r\n    }\r\n  },\r\n  \"primaryContact\": {\r\n    \"firstName\": \"First name of the primary contact\",\r\n    \"lastName\": \"Last name of the primary contact\",\r\n    \"email\": \"E-Mail address of the primary account\",\r\n    \"title\": \"Title of the primary contact (optional)\",\r\n    \"suffix\": \"Suffix of the primary contact (optional)\",\r\n    \"phone\": \"Phone number of the primary contact (optional)\"\r\n  },\r\n  \"accessRights\": \"Either 'full', 'read', or 'readwrite'\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/posoperators",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"posoperators"
+							]
+						},
+						"description": "This request invites a new PosOperator (i.e. merchant) to fiskaltrust's Portal and connects them to the PosDealer's account, which is specified by the `accountId` header.\n\nAfter the request has completed, the PosOperator will receive an email with further instructions to activate their account.\n\nPlease note that not all fields in the body of this request are mandatory (e.g. it is not required to include a SIREN number in non-French accounts). More details about required fields can be found on docs.fiskaltrust.cloud."
+					},
+					"response": []
+				},
+				{
+					"name": "Invite a new PosOperator (SHOW)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accountId",
+								"value": "{{posdealer_account_id}}",
+								"description": "The account ID of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							},
+							{
+								"key": "accessToken",
+								"value": "{{posdealer_access_token}}",
+								"description": "The account access token of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"company\": {\r\n    \"name\": \"Operator ES 43\",\r\n    \"email\": \"ft.posoperator1+ES43@gmail.com\",\r\n    \"addressLine1\": \"Pg. de Gregori Maians, 143\",\r\n    \"postalCode\": \"46780\",\r\n    \"city\": \"Oliva\",\r\n    \"country\": \"ES\",\r\n    \"phoneNumber\": \"+41 6555 98765432-43\",\r\n    \"identifiers\": {\r\n      \"vatId\": \"ES12345678943\"\r\n    }\r\n  },\r\n  \"primaryContact\": {\r\n    \"firstName\": \"ft.pos\",\r\n    \"lastName\": \"operator1+ES43\",\r\n    \"email\": \"ft.posoperator1+ES43@gmail.com\"/*,\r\n     \"title\": \"Title of the primary contact (optional)\",\r\n    \"suffix\": \"Suffix of the primary contact (optional)\",\r\n    \"phone\": \"Phone number of the primary contact (optional)\" */\r\n  },\r\n  \"accessRights\": \"full\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/posoperators",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"posoperators"
+							]
+						},
+						"description": "This request invites a new PosOperator (i.e. merchant) to fiskaltrust's Portal and connects them to the PosDealer's account, which is specified by the `accountId` header.\n\nAfter the request has completed, the PosOperator will receive an email with further instructions to activate their account.\n\nPlease note that not all fields in the body of this request are mandatory (e.g. it is not required to include a SIREN number in non-French accounts). More details about required fields can be found on docs.fiskaltrust.cloud."
+					},
+					"response": []
+				}
+			],
+			"description": "Please note to enter your access data as `Variables`, as described in the `Quickstart` section. This allows you to leave the `type of authorization` unchanged and to omit further specifications under `Pre-request Script` or `Tests`.  \nAdditional requested values are described below; each request is started using `Send`."
+		},
+		{
+			"name": "Create and manage outlets",
+			"item": [
+				{
+					"name": "List outlets of a PosOperator",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accountid",
+								"value": "{{posdealer_account_id}}",
+								"description": "The account ID of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							},
+							{
+								"key": "accesstoken",
+								"value": "{{posdealer_access_token}}",
+								"description": "The account access token of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/posoperators/00000000-0000-0000-0000-000000000000/outlets",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"posoperators",
+								"00000000-0000-0000-0000-000000000000",
+								"outlets"
+							]
+						},
+						"description": "This request lists all outlets of a PosOperator (i.e. the merchant) that is specified in the URL via their respective account ID.\n\nThe account IDs of connected PosOperators can be either obtained via the `/api/posoperators`, or via fiskaltrust's Portal.\n\n**Please note:**\n\n- While outlets have unique GUIDs, this API heavily uses the numeric outlet number to be closer to the workflows established in the Portal.\n- The outlet number 2 is reserved for internal usage and can neither be obtained nor edited."
+					},
+					"response": []
+				},
+				{
+					"name": "List outlets of a PosOperator (USE)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accountid",
+								"value": "{{posdealer_account_id}}",
+								"description": "The account ID of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							},
+							{
+								"key": "accesstoken",
+								"value": "{{posdealer_access_token}}",
+								"description": "The account access token of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/posoperators/04c52c23-2e01-ee11-8f6d-0022489fd3cc/outlets",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"posoperators",
+								"04c52c23-2e01-ee11-8f6d-0022489fd3cc",
+								"outlets"
+							]
+						},
+						"description": "This request lists all outlets of a PosOperator (i.e. the merchant) that is specified in the URL via their respective account ID.\n\nThe account IDs of connected PosOperators can be either obtained via the `/api/posoperators`, or via fiskaltrust's Portal.\n\n**Please note:**\n\n- While outlets have unique GUIDs, this API heavily uses the numeric outlet number to be closer to the workflows established in the Portal.\n- The outlet number 2 is reserved for internal usage and can neither be obtained nor edited."
+					},
+					"response": []
+				},
+				{
+					"name": "Get a specific outlet of a PosOperator",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accountid",
+								"value": "{{posdealer_account_id}}",
+								"description": "The account ID of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							},
+							{
+								"key": "accesstoken",
+								"value": "{{posdealer_access_token}}",
+								"description": "The account access token of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/posoperators/00000000-0000-0000-0000-000000000000/outlets/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"posoperators",
+								"00000000-0000-0000-0000-000000000000",
+								"outlets",
+								"1"
+							]
+						},
+						"description": "This request returns a specific outlet of a PosOperator (i.e. the merchant) that is specified in the URL via their respective account ID.\n\nThe account IDs of connected PosOperators can be either obtained via the `/api/posoperators`, or via fiskaltrust's Portal.\n\n**Please note:**\n\n- While outlets have unique GUIDs, this API heavily uses the numeric outlet number to be closer to the workflows established in the Portal.\n- The outlet number 2 is reserved for internal usage and can neither be obtained nor edited."
+					},
+					"response": []
+				},
+				{
+					"name": "Get a specific outlet of a PosOperator (SHOW)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accountid",
+								"value": "{{posdealer_account_id}}",
+								"description": "The account ID of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							},
+							{
+								"key": "accesstoken",
+								"value": "{{posdealer_access_token}}",
+								"description": "The account access token of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/posoperators/04c52c23-2e01-ee11-8f6d-0022489fd3cc/outlets/10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"posoperators",
+								"04c52c23-2e01-ee11-8f6d-0022489fd3cc",
+								"outlets",
+								"10"
+							]
+						},
+						"description": "This request returns a specific outlet of a PosOperator (i.e. the merchant) that is specified in the URL via their respective account ID.\n\nThe account IDs of connected PosOperators can be either obtained via the `/api/posoperators`, or via fiskaltrust's Portal.\n\n**Please note:**\n\n- While outlets have unique GUIDs, this API heavily uses the numeric outlet number to be closer to the workflows established in the Portal.\n- The outlet number 2 is reserved for internal usage and can neither be obtained nor edited."
+					},
+					"response": []
+				},
+				{
+					"name": "Edit a specific outlet of a PosOperator",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "accountid",
+								"value": "{{posdealer_account_id}}",
+								"description": "The account ID of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							},
+							{
+								"key": "accesstoken",
+								"value": "{{posdealer_access_token}}",
+								"description": "The account access token of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"locationId\": \"User-defined ID of the location\",\r\n    \"name\": \"Name of the outlet\",\r\n    \"address\": \"Address line of the outlet\",\r\n    \"postalCode\": \"Postal code of the outlet\",\r\n    \"city\": \"City of the outlet\",\r\n    \"county\": \"County of the outlet\",\r\n    \"stateOrProvince\": \"State or province of the outlet\",\r\n    \"country\": \"2-digit ISO code of the outlet's country, e.g. 'AT'\",\r\n    \"contactName\": \"Name of the contact person related to the outlet\",\r\n    \"telephone\": \"Phone number of the contact person related to the outlet\",\r\n    \"fax\": \"Fax number of the contact person related to the outlet\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/posoperators/00000000-0000-0000-0000-000000000000/outlets/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"posoperators",
+								"00000000-0000-0000-0000-000000000000",
+								"outlets",
+								"1"
+							]
+						},
+						"description": "This request updates a specific outlet of a PosOperator (i.e. the merchant) that is specified in the URL via their respective account ID.\n\nThe account IDs of connected PosOperators can be either obtained via the `/api/posoperators`, or via fiskaltrust's Portal.\n\n**Please note:**\n\n- While outlets have unique GUIDs, this API heavily uses the numeric outlet number to be closer to the workflows established in the Portal.\n- The outlet number 2 is reserved for internal usage and can neither be obtained nor edited."
+					},
+					"response": []
+				},
+				{
+					"name": "Edit a specific outlet of a PosOperator (USE)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "accountid",
+								"value": "{{posdealer_account_id}}",
+								"description": "The account ID of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							},
+							{
+								"key": "accesstoken",
+								"value": "{{posdealer_access_token}}",
+								"description": "The account access token of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"locationId\": \"Location Operator ES3-10\",\r\n    \"outletNumber\": 10,\r\n    \"name\": \"Outlet 10 of Operator ES1\",\r\n    \"address\": \"Pg. de Gregori Maians, 10\",\r\n    \"contactName\": \"CEO de Location ES1-10\",\r\n    \"telephone\": \"+356667597-1\",\r\n    \"fax\": \"+356667597-1-10\",\r\n    \"postalCode\": \"56780\",\r\n    \"city\": \"Oliva\",\r\n    \"county\": \"Valencia\",\r\n    \"stateOrProvince\": \"Valencia\",\r\n    \"country\": \"ES\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/posoperators/04c52c23-2e01-ee11-8f6d-0022489fd3cc/outlets/10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"posoperators",
+								"04c52c23-2e01-ee11-8f6d-0022489fd3cc",
+								"outlets",
+								"10"
+							]
+						},
+						"description": "This request updates a specific outlet of a PosOperator (i.e. the merchant) that is specified in the URL via their respective account ID.\n\nThe account IDs of connected PosOperators can be either obtained via the `/api/posoperators`, or via fiskaltrust's Portal.\n\n**Please note:**\n\n- While outlets have unique GUIDs, this API heavily uses the numeric outlet number to be closer to the workflows established in the Portal.\n- The outlet number 2 is reserved for internal usage and can neither be obtained nor edited."
+					},
+					"response": []
+				},
+				{
+					"name": "Edit a specific outlet with variables",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"/* used as locationId and name of outlet */\r",
+									"var location = \"Outlet - \" + \" \" + pm.variables.replaceIn('{{$randomColor}}');\r",
+									"pm.globals.set('locationID', location);\r",
+									"\r",
+									"/* used for address */\r",
+									"var address = pm.variables.replaceIn('{{$randomStreetName}}') + \" \" + pm.variables.replaceIn('{{$randomInt}}');\r",
+									"pm.globals.set('address', address);\r",
+									"\r",
+									"/* used for contact name */\r",
+									"var name = pm.variables.replaceIn('{{$randomFirstName}}');\r",
+									"pm.globals.set('Firstname', name);\r",
+									"\r",
+									"var Lname = pm.variables.replaceIn('{{$randomLastName}}');\r",
+									"pm.globals.set('Lastname', Lname);\r",
+									"\r",
+									"/* used for postal code */\r",
+									"pm.globals.set(\"randomNum\", _.random(1000, 99999));\r",
+									"\r",
+									"/* used for city */\r",
+									"var cname = pm.variables.replaceIn('{{$randomCity}}');\r",
+									"pm.globals.set('Cityname', cname);\r",
+									"\r",
+									"/* used for county and state or province */\r",
+									"var countyname = pm.variables.replaceIn('{{$randomCountry}}');\r",
+									"pm.globals.set('Countyname', countyname);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "accountid",
+								"value": "{{posdealer_account_id}}",
+								"description": "The account ID of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							},
+							{
+								"key": "accesstoken",
+								"value": "{{posdealer_access_token}}",
+								"description": "The account access token of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"locationId\": \"{{locationID}}\",\r\n    \"name\": \"{{locationID}}\",\r\n    \"address\": \"{{address}}\",\r\n    \"postalCode\": \"{{randomNum}}\",\r\n    \"city\": \"{{Cityname}}\",\r\n    \"county\": \"{{Countyname}}\",\r\n    \"stateOrProvince\": \"{{Countyname}}\",\r\n    \"country\": \"ES\",\r\n    \"contactName\": \"{{Firstname}} {{Lastname}}\"/* ,\r\n    \"telephone\": \"Phone number of the contact person related to the outlet\",\r\n    \"fax\": \"Fax number of the contact person related to the outlet\" */\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/posoperators/04c52c23-2e01-ee11-8f6d-0022489fd3cc/outlets/10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"posoperators",
+								"04c52c23-2e01-ee11-8f6d-0022489fd3cc",
+								"outlets",
+								"10"
+							]
+						},
+						"description": "This request updates a specific outlet of a PosOperator (i.e. the merchant) that is specified in the URL via their respective account ID.\n\nThe account IDs of connected PosOperators can be either obtained via the `/api/posoperators`, or via fiskaltrust's Portal.\n\n**Please note:**\n\n- While outlets have unique GUIDs, this API heavily uses the numeric outlet number to be closer to the workflows established in the Portal.\n- The outlet number 2 is reserved for internal usage and can neither be obtained nor edited."
+					},
+					"response": []
+				},
+				{
+					"name": "Create a new outlet",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accountid",
+								"value": "{{posdealer_account_id}}",
+								"description": "The account ID of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							},
+							{
+								"key": "accesstoken",
+								"value": "{{posdealer_access_token}}",
+								"description": "The account access token of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"locationId\": \"User-defined ID of the location\",\r\n  \"outletNumber\": 3,\r\n  \"name\": \"Name of the outlet\",\r\n  \"address\": \"Address line of the outlet\",  \r\n  \"postalCode\": \"Postal code of the outlet\",\r\n  \"city\": \"City of the outlet\",\r\n  \"county\": \"County of the outlet\",\r\n  \"stateOrProvince\": \"State or province of the outlet\",\r\n  \"country\": \"2-digit ISO code of the outlet's country, e.g. 'AT'\",\r\n  \"contactName\": \"Name of the contact person related to the outlet\",\r\n  \"telephone\": \"Phone number of the contact person related to the outlet\",\r\n  \"fax\": \"Fax number of the contact person related to the outlet\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/posoperators/00000000-0000-0000-0000-000000000000/outlets",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"posoperators",
+								"00000000-0000-0000-0000-000000000000",
+								"outlets"
+							]
+						},
+						"description": "This request creates a new outlet of a PosOperator (i.e. the merchant) that is specified in the URL via their respective account ID.\n\nThe account IDs of connected PosOperators can be either obtained via the `/api/posoperators`, or via fiskaltrust's Portal.\n\n**Please note:**\n\n- While outlets have unique GUIDs, this API heavily uses the numeric outlet number to be closer to the workflows established in the Portal.\n- The outlet number 2 is reserved for internal usage and can neither be obtained nor edited."
+					},
+					"response": []
+				},
+				{
+					"name": "Create a new outlet with ID",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accountid",
+								"value": "{{posdealer_account_id}}",
+								"description": "The account ID of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							},
+							{
+								"key": "accesstoken",
+								"value": "{{posdealer_access_token}}",
+								"description": "The account access token of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"locationId\": \"Location Operator ES3-15\",\r\n        \"outletNumber\": 15,\r\n        \"name\": \"Outlet 15 of Operator ES1\",\r\n        \"address\": \"Pg. de Gregori Maians, 28\",\r\n        \"contactName\": \"CEO de Location ES1-15\",\r\n        \"telephone\": \"+356667597-1\",\r\n        \"fax\": \"+356667597-1-15\",\r\n        \"postalCode\": \"56780\",\r\n        \"city\": \"Oliva\",\r\n        \"county\": \"Valencia\",\r\n        \"stateOrProvince\": \"Valencia\",\r\n        \"country\": \"ES\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/posoperators/04c52c23-2e01-ee11-8f6d-0022489fd3cc/outlets",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"posoperators",
+								"04c52c23-2e01-ee11-8f6d-0022489fd3cc",
+								"outlets"
+							]
+						},
+						"description": "This request creates a new outlet of a PosOperator (i.e. the merchant) that is specified in the URL via their respective account ID.\n\nThe account IDs of connected PosOperators can be either obtained via the `/api/posoperators`, or via fiskaltrust's Portal.\n\n**Please note:**\n\n- While outlets have unique GUIDs, this API heavily uses the numeric outlet number to be closer to the workflows established in the Portal.\n- The outlet number 2 is reserved for internal usage and can neither be obtained nor edited."
+					},
+					"response": []
+				},
+				{
+					"name": "Create a new outlet (USE)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"/* used as locationId and name of outlet */\r",
+									"var location = \"Outlet - \" + \" \" + pm.variables.replaceIn('{{$randomColor}}');\r",
+									"pm.globals.set('locationID', location);\r",
+									"\r",
+									"/* used for address */\r",
+									"var address = pm.variables.replaceIn('{{$randomStreetName}}') + \" \" + pm.variables.replaceIn('{{$randomInt}}');\r",
+									"pm.globals.set('address', address);\r",
+									"\r",
+									"/* used for contact name */\r",
+									"var name = pm.variables.replaceIn('{{$randomFirstName}}');\r",
+									"pm.globals.set('Firstname', name);\r",
+									"\r",
+									"var Lname = pm.variables.replaceIn('{{$randomLastName}}');\r",
+									"pm.globals.set('Lastname', Lname);\r",
+									"\r",
+									"/* used for postal code */\r",
+									"pm.globals.set(\"randomNum\", _.random(1000, 99999));\r",
+									"\r",
+									"/* used for city */\r",
+									"var cname = pm.variables.replaceIn('{{$randomCity}}');\r",
+									"pm.globals.set('Cityname', cname);\r",
+									"\r",
+									"/* used for county and state or province */\r",
+									"var countyname = pm.variables.replaceIn('{{$randomCountry}}');\r",
+									"pm.globals.set('Countyname', countyname);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accountid",
+								"value": "{{posdealer_account_id}}",
+								"description": "The account ID of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							},
+							{
+								"key": "accesstoken",
+								"value": "{{posdealer_access_token}}",
+								"description": "The account access token of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"locationId\": \"{{locationID}}\",\r\n        \"outletNumber\": 13,\r\n        \"name\": \"{{locationID}}\",\r\n        \"address\": \"{{address}}\",\r\n        \"contactName\": \"{{Firstname}} {{Lastname}}\",\r\n        \"telephone\": \"+356669599-8\",\r\n        \"fax\": \"+356669599-1-8\",\r\n        \"postalCode\": \"{{randomNum}}\",\r\n        \"city\": \"{{Cityname}}\",\r\n        \"county\": \"{{Countyname}}\",\r\n        \"stateOrProvince\": \"{{Countyname}}\",\r\n        \"country\": \"ES\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/posoperators/04c52c23-2e01-ee11-8f6d-0022489fd3cc/outlets",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"posoperators",
+								"04c52c23-2e01-ee11-8f6d-0022489fd3cc",
+								"outlets"
+							]
+						},
+						"description": "This request creates a new outlet of a PosOperator (i.e. the merchant) that is specified in the URL via their respective account ID.\n\nThe account IDs of connected PosOperators can be either obtained via the `/api/posoperators`, or via fiskaltrust's Portal.\n\n**Please note:**\n\n- While outlets have unique GUIDs, this API heavily uses the numeric outlet number to be closer to the workflows established in the Portal.\n- The outlet number 2 is reserved for internal usage and can neither be obtained nor edited."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Produce products",
+			"item": [
+				{
+					"name": "List available rollout plans  (SHOW)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accountid",
+								"value": "{{posdealer_account_id}}",
+								"description": "The account ID of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							},
+							{
+								"key": "accesstoken",
+								"value": "{{posdealer_access_token}}",
+								"description": "The account access token of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/rollout-plans",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"rollout-plans"
+							]
+						},
+						"description": "This request lists all available rollout plans that are available for the given PosDealer in their respective market.\n\nThe rollout plans returned by this endpoint can be executed to create products and subscriptions for conencted PosOperators (i.e. merchants), based on entitlements that need to be purchased via the Portal first (for more details, refer to _\"Produce a product based on a rollout plan\"_).\n\n**Please note:**\n\n- This endpoint only returns \"move entitlement\"-based rollout plans, i.e. those for which the PosDealer needs to obtain entitlements up-front. The PosDealer API currently does not support any operations that cause monetary transactions; those should be done via the Portal, after obtaining a volume purchase agreement. Please reach out to our sales team for further information.\n- For testing purposes, entitlements can be obtained for free in the Portal's shop in the sandbox, without requiring any payments\n- More details about the buy & resell process can be found [in our docs](https://docs.fiskaltrust.cloud/docs/posdealers/buy-resell/overview)"
+					},
+					"response": []
+				},
+				{
+					"name": "List available entitlements  (SHOW)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accountid",
+								"value": "{{posdealer_account_id}}",
+								"description": "The account ID of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							},
+							{
+								"key": "accesstoken",
+								"value": "{{posdealer_access_token}}",
+								"description": "The account access token of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/entitlements",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"entitlements"
+							]
+						},
+						"description": "This request lists the active entitlements that are available for the given PosDealer in their respective market.\n\nThese entitlements are consumed when rollout plans are executed, and converted into products and subscriptions for conencted PosOperators (i.e. merchants) (for more details, refer to _\"Produce a product based on a rollout plan\"_).\n\n**Please note:**\n\n- Entitlements cannot be obtained via this API. The PosDealer API currently does not support any operations that cause monetary transactions; those should be done via the Portal, after obtaining a volume purchase agreement. Please reach out to our sales team for further information.\n- For testing purposes, entitlements can be obtained for free in the Portal's shop in the sandbox, without requiring any payments.\n- More details about the buy & resell process can be found [in our docs](https://docs.fiskaltrust.cloud/docs/posdealers/buy-resell/overview)"
+					},
+					"response": []
+				},
+				{
+					"name": "Produce an outlet product based on a rollout plan  (SHOW)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accountid",
+								"value": "{{posdealer_account_id}}",
+								"description": "The account ID of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							},
+							{
+								"key": "accesstoken",
+								"value": "{{posdealer_access_token}}",
+								"description": "The account access token of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"rolloutPlanNumber\": \"4445-0001\",\r\n  \"outletNumbers\": [\r\n    \"numbers of outlets\"\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/posoperators/00000000-0000-0000-0000-000000000000/produce/outlets",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"posoperators",
+								"00000000-0000-0000-0000-000000000000",
+								"produce",
+								"outlets"
+							]
+						},
+						"description": "This request executes the specified rollout plan in a PosOperator's (i.e. merchant's) account, consuming entitlements from the PosDealer's account.\n\nExecuting a rollout plan will create a specific yearly subscription, e.g. for a carefree bundle. These subscriptions are assigned to an outlet (e.g. for the carefree bundle).\n\nThe outlet numbers need to be specified correctly in the body of this request.\n\nDetails about the rollout plans can be obtained via the `/api/rollout-plans` endpoint; the `rolloutType` property specified if the target of the plan is either an outlet or a Queue.\n\n**Please note:**\n\n- This endpoint only works with \"move entitlement\"-based rollout plans, i.e. those for which the PosDealer needs to obtain entitlements up-front. The PosDealer API currently does not support any operations that cause monetary transactions; those should be done via the Portal, after obtaining a volume purchase agreement. Please reach out to our sales team for further information.\n- For testing purposes, entitlements can be obtained for free in the Portal's shop in the sandbox, without requiring any payments\n- More details about the buy & resell process can be found [in our docs]()"
+					},
+					"response": []
+				},
+				{
+					"name": "Produce a queue product based on a rollout plan",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accountid",
+								"value": "{{posdealer_account_id}}",
+								"description": "The account ID of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							},
+							{
+								"key": "accesstoken",
+								"value": "{{posdealer_access_token}}",
+								"description": "The account access token of the PosDealer account - can be taken from the Portal",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"rolloutPlanNumber\": \"4445-0110\",\r\n  \"queueIds\": [\r\n    \"IDs of the queues\"\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/posoperators/00000000-0000-0000-0000-000000000000/produce/queues",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"posoperators",
+								"00000000-0000-0000-0000-000000000000",
+								"produce",
+								"queues"
+							]
+						},
+						"description": "This request executes the specified rollout plan in a PosOperator's (i.e. merchant's) account, consuming entitlements from the PosDealer's account.\n\nExecuting a rollout plan will create a specific yearly subscription, e.g. for a PosArchive. These subscriptions are either assigned to a Middleware component (e.g. a Queue for the PosArchive standalone product).\n\nThe Queue IDs need to be specified correctly in the body of this request.\n\nDetails about the rollout plans can be obtained via the `/api/rollout-plans` endpoint; the `rolloutType` property specified if the target of the plan is either an outlet or a Queue.\n\n**Please note:**\n\n- This endpoint only works with \"move entitlement\"-based rollout plans, i.e. those for which the PosDealer needs to obtain entitlements up-front. The PosDealer API currently does not support any operations that cause monetary transactions; those should be done via the Portal, after obtaining a volume purchase agreement. Please reach out to our sales team for further information.\n- For testing purposes, entitlements can be obtained for free in the Portal's shop in the sandbox, without requiring any payments\n- More details about the buy & resell process can be found [in our docs]()"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"",
+					"let today = new Date();",
+					"let hours = today.getHours().toString().padStart(2, \"0\");",
+					"let minutes = today.getMinutes().toString().padStart(2, \"0\");",
+					"let seconds = today.getSeconds().toString().padStart(2, \"0\");",
+					"let day = today.getDate().toString().padStart(2, \"0\");",
+					"let month = (today.getMonth() + 1).toString().padStart(2, \"0\");",
+					"let year = today.getFullYear().toString();",
+					"",
+					"let now = `${day}.${month}.${year} ${hours}:${minutes}`;",
+					"let globalVar = pm.globals.get(\"COMP\");",
+					"console.log(\"made at \" +now +\" by pre-request-script of collection, proudly presented by: \" + globalVar);"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "posdealer_account_id",
+			"value": "2767dfcf-3fa4-45df-abc4-271cc757c87c",
+			"type": "string"
+		},
+		{
+			"key": "posdealer_access_token",
+			"value": "BM8Asgd4Y52xzfjBMJiAE29SL6dArVidQlzxB4FJn9ch30aqlH6hKaSCvu/JOx3lZuS0NCilWq8AHdwzu/2O3YE=",
+			"type": "string"
+		},
+		{
+			"key": "base_url",
+			"value": "https://posdealer-api-sandbox.fiskaltrust.cloud",
+			"type": "string"
+		}
+	]
+}
